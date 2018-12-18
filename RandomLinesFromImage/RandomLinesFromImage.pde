@@ -11,14 +11,14 @@ PGraphics vectorImage;
 // this runs once
 void setup() {
   //  WIDTH  HEIGHT
-  size(600, 600); // size of canvas matches bitmapImage image
+  size(550, 550); // size of canvas matches bitmapImage image
   
   noFill();
   strokeWeight(2);
   background(255);
 
   // load the image
-  bitmapImage = loadImage("van.JPG");
+  bitmapImage = loadImage("image.jpg");
 
   // we want to manipulate the pixels of this image directly
   bitmapImage.loadPixels();
@@ -30,14 +30,14 @@ void setup() {
   vectorImage.beginDraw();
 
   // Make a loop that lets us look at all pixels
-  // From 0 to 423,999 (800 x 530)
+  // From 0 to 423,999 (550 x 550)
   int position = 0;  // make a simple variable that starts at 0
   // loop so long as position is less than or equal to 423,999
-  while (position <= 359999) {
+  while (position <= 302499) {
     
     // Get the brightness
     float b = 255 - brightness(bitmapImage.pixels[position]);  // 0 to 255
-    float diameter = map(b, 0, 255, 2, 5);         // 1 to 8
+    float diameter = map(b, 0, 255, 2, 10);         // 1 to 8
     
     // Where to draw the ellipse?
     int x = position % width;
@@ -45,14 +45,19 @@ void setup() {
     
     // Draw an ellipse for every 100th pixel
     //   CONDITION1   AND  CONDITION2
-    if ( (x > 0) && (x % 7 == 0) && (y > 0) && (y % 7 == 0) ) {
+    if ( (x > 0) && (x % 12 == 0) && (y > 0) && (y % 12 == 0) ) {
 
-      ellipse(x, y, diameter, diameter);  // Draw at (x, y) with given diameter
+     // ellipse(x, y, diameter, diameter);  // Draw at (x, y) with given diameter
+     int timesToRepeat = round(diameter) / 2 ;
+     int j = 0;
+     while (j  < timesToRepeat) {
+       randomLine(diameter / 2, x, y);
+       j += 1; 
+     }
       
-      // draw the circle to the PDF
-      vectorImage.ellipse(x, y, diameter, diameter); // draw circle at (x, y) with given diameter
-
     }
+  
+    
     
     // Increment the position
     position += 1;
@@ -95,46 +100,42 @@ void penUp() {
 void penDown() {
  strokeWeight(1);
 }
-//}
-//func randomLines(withinRadius radius : Double) {
-       
-//        // Make the line size be twice the radius
-//        let size = radius * 2
-        
-//        // Make sure the point generated is inside the circle
-//        var x1 = 0.0
-//        var y1 = 0.0
-//        repeat {
-//            x1 = self.random(size) - size / 2
-//            y1 = self.random(size) - size / 2
-//        } while outsideCircle(radius: radius, xPos: x1, yPos: y1)
-        
-//        // Now go to the starting point
-//        self.goto(x1, y1)
-//        self.penDown()
-        
-//        // Make sure the endpoint is in the circle
-//        var x2 = 0.0
-//        var y2 = 0.0
-//        repeat {
-            
-//            x2 = self.random(size) - size / 2
-//            y2 = self.random(size) - size / 2
-            
-//        } while outsideCircle(radius: radius, xPos: x2, yPos: y2)
-        
-//        // draw the line to the endpoint
-//        self.goto(x2,y2)
-        
-//        self.penUp()
-        
-//    }
+
+
+ 
+void randomLine(float radius, float centreX, float centreY) {
+ 
+  // Make the line size be twice the radius
+  final float size = radius * 2;
+ 
+  // Make sure the point generated is inside the circle
+  float x1 = 500.0;
+  float y1 = 500.0;
+  while (outsideCircle(radius, centreX, centreY, x1, y1) == true) {
+      x1 = random(size) - size / 2 + centreX;
+      y1 = random(size) - size / 2 + centreY;
+  } 
+          
+  // Make sure the endpoint is in the circle
+  float x2 = 500.0;
+  float y2 = 500.0;
+  while (outsideCircle(radius, centreX, centreY, x2, y2) == true) {
+      x2 = random(size) - size / 2 + centreX;
+      y2 = random(size) - size / 2 + centreY;
+  } 
+  
+  //draw random line
+  vectorImage.line(x1, y1, x2, y2); 
+  line(x1, y1, x2, y2); //<>//
+  
+}
     
-//    func outsideCircle(radius : Double, xPos : Double, yPos : Double) -> Bool {
-//        let distance = sqrt(xPos * xPos + yPos * yPos)
-//        if distance > radius {
-//            return true
-//        } else {
-//            return false
-//        }
-//    }
+boolean outsideCircle(float radius, float centreX, float centreY, float endXPos, float endYPos) {
+  
+    final float distance = sqrt(pow(centreX - endXPos, 2) + pow(centreY - endYPos, 2) );
+    if (distance > radius) {
+        return true;
+    } else {
+        return false;
+    }
+}
